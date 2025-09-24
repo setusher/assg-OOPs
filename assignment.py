@@ -1,11 +1,7 @@
-from errors import BadFormatException, InvalidPassword
 from typing import TypeVar
-from student import Student
-from club import Club
+import datetime
 
 T = TypeVar('T')
-
-
 
 
 class Assignment:
@@ -14,10 +10,7 @@ class Assignment:
         self.max_score = max_score
         self.deadline = deadline
         self.club = club
-        #submissions
+        # submissions
 
-
-    def isLate(self, submission_date: datetime) -> bool:
+    def is_late(self, submission_date: datetime) -> bool:
         return submission_date > self.deadline
-
-    
