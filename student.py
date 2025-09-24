@@ -22,13 +22,8 @@ class Student:
         # do ops to register this user and return student obj
 
     @staticmethod
-    def login(enrollment: str, password: str, student_list: list):
-        for student in student_list:
-            if student.enrollment == enrollment and student.password == password:
-                print("Login successful!")
-                return student
-        print("Login failed!")
-        return None
+    def login(enrollment: str, password: str):
+        pass
 
     def join_club(self, club: 'Club'):
         if club not in self.clubs:
