@@ -21,6 +21,8 @@ class Club:
         self.members: list['ClubMember'] = []
         self.assignments: list['Assignment'] = assignments or []
 
+        from club_member import ClubAdmin, ClubMember
+
         admin_m = ClubAdmin(admin, self)
         self.members.append(admin_m)
         admin.clubs.append(self)
