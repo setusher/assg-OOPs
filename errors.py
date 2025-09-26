@@ -1,6 +1,7 @@
 class BadFormatException(Exception):
     pass
 
+
 class InvalidPassword(BadFormatException):
     def __init__(self):
         super().__init__("Password must be 8 characters long!")
@@ -9,3 +10,8 @@ class InvalidPassword(BadFormatException):
 class AlreadyMember(Exception):
     def __init__(self):
         super().__init__("User already member of the club!")
+
+
+class NotMember(Exception):
+    def __init__(self):
+        super().__init__("User is not a member of this club!")

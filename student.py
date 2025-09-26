@@ -3,10 +3,13 @@ from typing import TypeVar
 from assignment import Assignment
 from club import Club
 from club_member import ClubMember
-from errors import BadFormatException, InvalidPassword, AlreadyMember
+from database import Database
+from errors import BadFormatException, InvalidPassword, AlreadyMember, NotMember
 from submission import Submission
 
 T = TypeVar('T')
+
+db = Database()
 
 
 class Student:
@@ -22,25 +25,37 @@ class Student:
 
         if len(self.password) < 8:
             raise InvalidPassword()
-        # do ops to register this user and return student obj
+
+        if db.get_student(self.enrollment):
+            raise BadFormatException("Student with this enrollment already exists")
+
+        db.add_student(self)
+        return self
 
     @staticmethod
     def login(enrollment: str, password: str):
-        pass
+        student = db.get_student(enrollment)
+        if student and student.password == password:
+            return student
+        return None
 
     def join_club(self, club: Club) -> ClubMember:
+        if club in self.clubs:
+            raise AlreadyMember()
+
+        self.clubs.append(club)
+        member = club.add_member(self)
+        return member
+
+    def leave_club(self, club: Club):
         if club not in self.clubs:
-            self.clubs.append(club)
-            club.add_member(self)
-            # create a club member in singleton and then return it here
-        else:
-            raise AlreadyMember
+            raise NotMember()
 
-    def leave_club(self, club: Club) -> bool:
-        pass
+        self.clubs.remove(club)
+        club.remove_member(self)
 
-    def get_clubs(self):
-        return self.clubs
+    def get_clubs(self) -> [Club]:
+        return self.clubs.copy()
 
     def get_assignments(self):
         pass
