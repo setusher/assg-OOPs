@@ -1,8 +1,5 @@
-from errors import BadFormatException, InvalidPassword
-from typing import TypeVar
 import datetime
-from student import Student
-from club import Club
+from typing import TypeVar
 
 T = TypeVar('T')
 

@@ -15,3 +15,8 @@ class AlreadyMember(Exception):
 class NotMember(Exception):
     def __init__(self):
         super().__init__("User is not a member of this club!")
+
+
+class PermissionDenied(Exception):
+    def __init__(self):
+        super().__init__("You don't have permission to perform this action!")

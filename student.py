@@ -2,9 +2,8 @@ from typing import TypeVar
 
 from assignment import Assignment
 from club import Club
-from club_member import ClubMember
 from database import Database
-from errors import BadFormatException, InvalidPassword, AlreadyMember, NotMember
+from errors import BadFormatException, InvalidPassword, NotMember
 from submission import Submission
 
 T = TypeVar('T')
@@ -39,14 +38,6 @@ class Student:
             return student
         return None
 
-    def join_club(self, club: Club) -> ClubMember:
-        if club in self.clubs:
-            raise AlreadyMember()
-
-        self.clubs.append(club)
-        member = club.add_member(self)
-        return member
-
     def leave_club(self, club: Club):
         if club not in self.clubs:
             raise NotMember()
@@ -54,14 +45,14 @@ class Student:
         self.clubs.remove(club)
         club.remove_member(self)
 
-    def get_clubs(self) -> [Club]:
+    def get_clubs(self) -> list[Club]:
         return self.clubs.copy()
 
     def get_assignments(self):
         pass
 
-    def submit_assignment(self, assignment: Assignment) -> Submission:
+    def submit_assignment(self, assignment: Assignment, content: str) -> Submission:
         pass
 
-    def get_submissions(self) -> [Submission]:
+    def get_submissions(self) -> list[Submission]:
         pass
