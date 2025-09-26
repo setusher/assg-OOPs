@@ -26,15 +26,6 @@ class ClubMember:
     def view_my_submissions(self) -> [Submission]:
         return [s for s in self.student.get_submissions() if s.assignment.club == self.club]
 
-    def add_assignment(self, title: str, max_score: int, deadline: str) -> Assignment:
-        assignment = Assignment(title, max_score, deadline, self.club)
-        self.club.assignments.append(assignment)
-        return assignment
-
-    def remove_assignment(self, assignment: Assignment):
-        if assignment in self.club.assignments:
-            self.club.assignments.remove(assignment)
-
 
 # Admin capabilities minus the add/remove member
 class ClubManager(ClubMember):
@@ -44,6 +35,15 @@ class ClubManager(ClubMember):
 
     def view_all_submissions(self) -> [Submission]:
         return [s for s in db.submissions if s.assignment.club == self.club]
+
+    def add_assignment(self, title: str, max_score: int, deadline: str) -> Assignment:
+        assignment = Assignment(title, max_score, deadline, self.club)
+        self.club.assignments.append(assignment)
+        return assignment
+
+    def remove_assignment(self, assignment: Assignment):
+        if assignment in self.club.assignments:
+            self.club.assignments.remove(assignment)
 
 
 # Admin has all permissions associated with club
