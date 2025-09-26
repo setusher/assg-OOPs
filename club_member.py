@@ -20,21 +20,12 @@ class ClubMember:
     def view_club_assignments(self) -> [Assignment]:
         return self.club.view_assignments()
 
-    def submit_assignment(self, assignment: Assignment, content: str) -> Submission:
-        return self.student.submit_assignment(assignment, content)
-
     def view_my_submissions(self) -> [Submission]:
         return [s for s in self.student.get_submissions() if s.assignment.club == self.club]
 
 
 # Admin capabilities minus the add/remove member
 class ClubManager(ClubMember):
-
-    def grade_submission(self, submission: Submission, score: int, feedback: str = ""):
-        pass
-
-    def view_all_submissions(self) -> [Submission]:
-        return [s for s in db.submissions if s.assignment.club == self.club]
 
     def add_assignment(self, title: str, max_score: int, deadline: str) -> Assignment:
         assignment = Assignment(title, max_score, deadline, self.club)
