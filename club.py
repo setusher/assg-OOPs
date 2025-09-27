@@ -1,3 +1,6 @@
+from typing import Optional
+
+from assignment import Assignment
 from club_member import ClubMember
 from database import Database
 from errors import AlreadyMember, NotMember
@@ -8,7 +11,7 @@ db = Database()
 class Club:
     def __init__(self, name: str, admin: 'Student', assignments: list['Assignment'] = None):
         self.name = name
-        self.admin: 'Student' = admin
+        self.admin: 'ClubAdmin' = admin
         self.members: list['ClubMember'] = []
         self.assignments: list['Assignment'] = assignments or []
 
@@ -33,17 +36,28 @@ class Club:
             if m.student == student:
                 to_rem = m
                 break
-
         if to_rem:
             self.members.remove(to_rem)
         else:
             raise NotMember()
 
-    def list_members(self):
-        return self.members
+    def add_assignment(self, assignment: 'Assignment'):
+        self.assignments.append(assignment)
 
     def view_assignments(self):
         return self.assignments.copy()
 
+    def remove_assignment(self, assignment: 'Assignment'):
+        try:
+            self.assignments.remove(assignment)
+        except ValueError:
+            pass
+
     def is_member(self, student: 'Student') -> bool:
-        return any(m.student == student for m in self.members)
+        return self.get_member(student) is not None
+
+    def get_member(self, student: 'Student') -> Optional['ClubMember']:
+        for m in self.members:
+            if m.student == student:
+                return m
+        return None

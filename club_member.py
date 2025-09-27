@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from database import Database
-from errors import AlreadyMember, PermissionDenied
 
 if TYPE_CHECKING:
     from assignment import Assignment
@@ -31,28 +30,24 @@ class ClubMember:
 class ClubManager(ClubMember):
 
     def add_assignment(self, title: str, max_score: int, deadline: datetime) -> 'Assignment':
-        assignment = Assignment(title, max_score, deadline, self.club)
-        self.club.assignments.append(assignment)
+        assignment = Assignment(title, max_score, deadline, self.club, self)
+        self.club.add_assignment(assignment)
         return assignment
 
     def remove_assignment(self, assignment: 'Assignment'):
-        if assignment in self.club.assignments:
-            self.club.assignments.remove(assignment)
+        self.club.remove_assignment(assignment)
 
 
 # Admin has all permissions associated with club
 class ClubAdmin(ClubManager):
 
     def add_member(self, student: 'Student') -> ClubMember:
-        if self.club.is_member(student):
-            raise AlreadyMember()
         member = self.club.add_member(student)
         student.clubs.append(self.club)
+        db.update_student(student)
         return member
 
-    def remove_member(self, member: ClubMember):
-        if member.club != self.club:
-            raise PermissionDenied()
-
-        self.club.members.remove(member)
-        member.student.clubs.remove(self.club)
+    def remove_member(self, student: 'Student'):
+        self.club.remove_member(student)
+        student.clubs.remove(self.club)
+        db.update_student(student)
