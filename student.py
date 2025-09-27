@@ -1,6 +1,9 @@
 from typing import TypeVar
+
+from club import Club
 from database import Database
 from errors import BadFormatException, InvalidPassword
+from session import Session
 
 T = TypeVar('T')
 
@@ -44,3 +47,10 @@ class Student:
     def get_submissions(self) -> list['Submission']:
         sub = [x for x in db.submissions if x.student == self]
         return sub.copy()
+
+    def create_club(self, name: str):
+        session = Session()
+        club = Club(name, session.current_user)
+        db.add_club(club)
+        self.clubs.append(club)
+        db.update_student(self)
