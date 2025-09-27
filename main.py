@@ -83,6 +83,12 @@ def handle_login():
         typer.secho(f"\n🎉 Welcome back {student.name}!", fg=typer.colors.GREEN, bold=True)
     else:
         typer.secho("\n❌ Login failed! Invalid enrollment or password.", fg=typer.colors.RED, bold=True)
+  
+
+
+
+
+    
 
 if __name__ == "__main__":
     app()
