@@ -3,7 +3,6 @@ from typing import TypeVar
 from club import Club
 from database import Database
 from errors import BadFormatException, InvalidPassword
-from session import Session
 
 
 T = TypeVar('T')
@@ -50,6 +49,7 @@ class Student:
         return sub.copy()
 
     def create_club(self, name: str):
+        from session import Session
         if any(x.club.name == name for x in db.get_clubs()):
             raise BadFormatException("Club with same name already exists!")
 

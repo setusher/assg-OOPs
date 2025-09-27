@@ -49,6 +49,7 @@ def main_menu():
         elif choice == "Exit":
             typer.secho("\n👋 Thank you for using Student Management System!",
                        fg=typer.colors.GREEN, bold=True)
+            break
         elif choice is None:
             typer.secho("\n👋 Goodbye!", fg=typer.colors.YELLOW)
             break
@@ -205,11 +206,11 @@ def show_club_menu(club):
         typer.secho("❌ You are not a member of this club.", fg=typer.colors.RED)
         return
 
-    options = ["View Assignments", "Submit Assignment"]
+    options = ["View Assignments", "Submit Assignment", "View members"]
     if isinstance(member, ClubManager):
         options += ["Add Assignment", "Remove Assignment"]
     if isinstance(member, ClubAdmin):
-        options += ["Add Member", "Remove Member"]
+        options += ["Add Member", "Remove Member", "Promote Member"]
 
     options.append("Back")
 
@@ -246,6 +247,23 @@ def show_club_menu(club):
                     typer.echo(
                         f"- {s.assignment.title} | Score: {s.score if s.score is not None else 'Not graded'} | Feedback: {s.feedback or 'N/A'}"
                     )
+
+        elif choice == "View members":
+            if not club.members:
+                typer.secho("📌 No members in this club yet.", fg=typer.colors.MAGENTA)
+                continue
+
+            typer.secho("\n📋 Club Members:", fg=typer.colors.BLUE, bold=True)
+            for m in club.members:
+                role = ""
+                from club_member import ClubAdmin, ClubManager
+                if isinstance(m, ClubAdmin):
+                    role = typer.style("(Admin)", fg=typer.colors.RED, bold=True)
+                elif isinstance(m, ClubManager):
+                    role = typer.style("(Manager)", fg=typer.colors.YELLOW, bold=True)
+
+                typer.echo(f"- {m.student.name} {role}")
+
 
         elif choice == "Add Assignment" and isinstance(member, (ClubManager, ClubAdmin)):
             title = typer.prompt("Assignment title")
@@ -305,14 +323,42 @@ def show_club_menu(club):
                 typer.secho(f"❌ {selected_name} is not a member.", fg=typer.colors.RED)
 
 
+        elif choice == "Promote Member" and isinstance(member, ClubAdmin):
+            from errors import NotMember, BadFormatException
+            from club_member import ClubManager, ClubMember
+
+            eligible_members = [
+                m for m in club.members
+                if isinstance(m, ClubMember) and not isinstance(m, (ClubManager, ClubAdmin))
+            ]
+
+            if not eligible_members:
+                typer.secho("📌 No members available for promotion.", fg=typer.colors.MAGENTA)
+                continue
+
+            member_names = [m.student.name for m in eligible_members]
+            selected_name = select_option(member_names + ["Back"], "Select a member to promote:")
+
+            if selected_name == "Back" or selected_name is None:
+                continue
+
+            to_promote = next(m for m in eligible_members if m.student.name == selected_name)
+
+            try:
+                member.promote_member(to_promote)
+                typer.secho(f"✅ {selected_name} has been promoted to Manager!", fg=typer.colors.GREEN)
+            except BadFormatException as e:
+                typer.secho(f"❌ {e}", fg=typer.colors.RED)
+            except NotMember:
+                typer.secho("❌ Selected student is not a member of this club.", fg=typer.colors.RED)
+
+
+
+
         elif choice == "Back" or choice is None:
             break
         
 
-
-
-
-    
 
 if __name__ == "__main__":
     app()

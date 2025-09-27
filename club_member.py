@@ -53,15 +53,23 @@ class ClubAdmin(ClubManager):
         student.clubs.remove(self.club)
         db.update_student(student)
 
-    def promote_member(self, member: 'ClubMember'):
-        target_index = -1
-        for i, m in enumerate(self.club.members):
-            if m == member:
-                target_index = i
-        if not self.club.is_member(member):
+    def promote_member(self, member):
+        
+        from club_member import ClubManager, ClubAdmin, ClubMember
+        from errors import BadFormatException, NotMember
+
+        
+        if member not in self.club.members:
             raise NotMember()
-        if isinstance(member, ClubManager) or isinstance(member, ClubAdmin):
+
+        target_index = self.club.members.index(member)
+
+        
+        if isinstance(self.club.members[target_index], (ClubManager, ClubAdmin)):
             raise BadFormatException("The member is already a manager/admin!")
-        manager = ClubManager(member.student, self.club)
-        manager.joined_date = member.joined_date
-        self.club.members[target_index] = manager
+
+    
+        promoted = ClubManager(member.student, self.club)
+        self.club.members[target_index] = promoted
+
+        return promoted
