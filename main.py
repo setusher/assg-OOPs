@@ -206,7 +206,7 @@ def show_club_menu(club):
         typer.secho("❌ You are not a member of this club.", fg=typer.colors.RED)
         return
 
-    options = ["View Assignments", "Submit Assignment", "View members"]
+    options = ["View Assignments", "View Submissions", "View members"]
     if isinstance(member, ClubManager):
         options += ["Add Assignment", "Remove Assignment"]
     if isinstance(member, ClubAdmin):
@@ -225,10 +225,36 @@ def show_club_menu(club):
             assignments = club.view_assignments()
             if not assignments:
                 typer.secho("📌 No assignments yet.", fg=typer.colors.MAGENTA)
-            else:
-                typer.secho("\n📋 Assignments:", fg=typer.colors.BLUE, bold=True)
-                for a in assignments:
-                    typer.echo(f"- {a.title} | Max Score: {a.max_score} | Deadline: {a.deadline}")
+                continue
+
+            assignment_titles = [a.title for a in assignments]
+            selected_title = select_option(assignment_titles + ["Back"], "Select an assignment:")
+
+            if selected_title == "Back" or selected_title is None:
+                continue
+
+            selected_assignment = next(a for a in assignments if a.title == selected_title)
+
+            while True:
+                typer.secho(f"\n Assignment: {selected_assignment.title}", fg=typer.colors.BLUE, bold=True)
+                sub_options = ["Submit Assignment", "Back"]
+                sub_choice = select_option(sub_options, "Choose an action:")
+
+                if sub_choice == "Submit Assignment":
+                 
+                    content = typer.prompt("Enter your submission text")
+                    from submission import Submission
+                    student = session.get_current_user()
+
+                    submission = Submission(student=student, assignment=selected_assignment, content=content)
+                    selected_assignment.add_submission(submission)
+
+                    typer.secho("✅ Submission added successfully!", fg=typer.colors.GREEN)
+                    break  
+
+                elif sub_choice == "Back" or sub_choice is None:
+                    break
+
 
         elif choice == "View Submissions":
             submissions = []
