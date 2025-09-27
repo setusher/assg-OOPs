@@ -1,8 +1,10 @@
 from datetime import datetime
 from typing import TypeVar
 
-from club_member import ClubManager
+from club_member import ClubManager, ClubMember
 from database import Database
+from errors import PermissionDenied
+from session import Session
 from submission import Submission
 
 T = TypeVar('T')
@@ -24,9 +26,14 @@ class Assignment:
         return s
 
     def view_submissions(self) -> list['Submission']:
-        return self.submissions.copy()
-        # TODO This should be based on current user -
-        #  if manager then return all otherwise only of that user's own
+        session = Session()
+        mem = self.club.get_member(session.current_user)
+        if mem is None:
+            raise PermissionDenied()
+        elif isinstance(mem, ClubMember):
+            return [x for x in self.submissions if x.student == session.current_user].copy()
+        else:
+            return self.submissions.copy()
 
     def is_late(self, submission_date: datetime) -> bool:
         return submission_date > self.deadline
