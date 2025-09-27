@@ -1,12 +1,18 @@
 import inquirer
 import typer
-
+from database import Database
+from session import Session
 from errors import BadFormatException, InvalidPassword
 from student import Student
+import typer
+import sys
+import inquirer
+from typing import Optional
 
 app = typer.Typer(help="Student Management System")
-
-students = []
+db = Database()
+session  =Session()
+students = db.get_students()
 clubs = []
 current_user = None
 
@@ -29,7 +35,7 @@ def select_option(options, message):
 
 @app.command()
 def main_menu():
-    options = ["Register", "login", "Exit"]
+    options = ["Register", "Login", "Exit"]
     while True:
         typer.echo("\n" + "="*50)
         typer.secho("🎓 Student Management System", fg=typer.colors.CYAN, bold=True)
@@ -77,13 +83,47 @@ def handle_login():
     enrollment = typer.prompt("Enrollment number").strip()
     password = typer.prompt("🔒 Password", hide_input=True)
 
-    student = Student.login(enrollment, password)
+    student = session.login(enrollment, password)
 
     if student:
         typer.secho(f"\n🎉 Welcome back {student.name}!", fg=typer.colors.GREEN, bold=True)
+        show_dashboard()
     else:
         typer.secho("\n❌ Login failed! Invalid enrollment or password.", fg=typer.colors.RED, bold=True)
   
+def show_dashboard():
+    dashboard_options = ["All Clubs", "My Clubs", "My Assignments", "My Submissions"]
+    while True:
+        while True:
+            typer.echo("\n" + "="*50)
+            typer.secho("Student Dashboard", fg=typer.colors.CYAN, bold=True)
+            typer.echo("="*50)
+
+            choice = select_option(dashboard_options,"What would you like to choose?")
+
+            if choice == "All Clubs":
+                show_all_clubs()
+            elif choice == "My Clubs":
+                show_my_clubs()
+            elif choice == "My Assignments":
+                show_my_assgs()
+            elif choice == "My Submissions":
+                show_my_subs()
+                break
+
+def show_all_clubs():
+    pass
+
+def show_my_clubs():
+    pass
+
+def show_my_assgs():
+    pass
+
+def show_my_subs():
+    pass
+
+        
 
 
 
