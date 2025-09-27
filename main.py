@@ -1,15 +1,8 @@
-from student import Student
-from club import Club
-from assignment import Assignment
-from submission import Submission
-from errors import BadFormatException, InvalidPassword, AlreadyMember
-import datetime
-import typer
-from typer import colors
 import inquirer
-import sys
-from typing import Optional
+import typer
 
+from errors import BadFormatException, InvalidPassword
+from student import Student
 
 app = typer.Typer(help="Student Management System")
 
