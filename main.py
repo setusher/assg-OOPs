@@ -91,7 +91,7 @@ def handle_login():
         typer.secho("\n❌ Login failed! Invalid enrollment or password.", fg=typer.colors.RED, bold=True)
   
 def show_dashboard():
-    dashboard_options = ["All Clubs", "My Clubs", "My Assignments", "My Submissions", "Logout"]
+    dashboard_options = ["All Clubs", "My Clubs", "My Assignments", "My Submissions", "Create Club", "Logout"]
     while True:
         while True:
             typer.echo("\n" + "="*50)
@@ -108,6 +108,8 @@ def show_dashboard():
                 show_my_assgs()
             elif choice == "My Submissions":
                 show_my_subs()
+            elif choice == "Create Club":
+                create_club()    
             elif choice == "Logout":
                 session.logout()
                 typer.secho("👋 Logged out successfully.", fg=typer.colors.YELLOW)
@@ -159,6 +161,32 @@ def show_my_subs():
         typer.echo(
              f"- {s.assignment.title} | Score: {s.score if s.score is None else 'Not Graded'} | Feedback: {s.feedback or 'N/A'}"
         )
+
+def create_club():
+    typer.echo("\n" + "="*30)
+    typer.secho("📝 Create Club", fg=typer.colors.BLUE, bold=True)
+    typer.echo("="*30)
+
+    student = session.get_current_user()
+    
+    # typer.secho("\n📝 Create a New Club", fg=typer.colors.BLUE, bold=True)
+
+    name = typer.prompt("Enter club name").strip()
+    description = typer.prompt("Enter club description").strip()
+
+    if any(c.name == name for c in db.clubs):
+        typer.secho("❌ A club with this name already exists.", fg=typer.colors.RED)
+        return
+
+
+    from club import Club
+    new_club = Club(name=name, admin=student)    
+    db.clubs.append(new_club)
+
+    typer.secho(f"✅ Club '{new_club.name}' created successfully! You are the admin.", fg=typer.colors.GREEN)
+
+
+
 
         
 

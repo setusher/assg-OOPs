@@ -44,3 +44,10 @@ class Student:
     def get_submissions(self) -> list['Submission']:
         sub = [x for x in db.submissions if x.student == self]
         return sub.copy()
+
+    def create_club(self, name: str, description: str):
+        if db.get_club(name):
+            raise Exception("Club already exists!")
+        new_club = Club(name, description, self.enrollment)
+        db.add_club(new_club)
+        return new_club
