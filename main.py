@@ -113,6 +113,7 @@ def show_dashboard():
             elif choice == "Logout":
                 session.logout()
                 typer.secho("👋 Logged out successfully.", fg=typer.colors.YELLOW)
+                return
 
 def show_all_clubs():
     if not db.clubs:
@@ -195,7 +196,25 @@ def create_club():
     typer.secho(f"✅ Club '{new_club.name}' created successfully! You are the admin.", fg=typer.colors.GREEN)
 
 def show_club_menu(club):
-    options = ["View Assignments", "View Submissions", "Back"]
+    from club_member import ClubAdmin, ClubManager, ClubMember
+
+    student = session.get_current_user()
+    member = club.get_member(student)
+
+    if member is None:
+        typer.secho("❌ You are not a member of this club.", fg=typer.colors.RED)
+        return
+
+    options = ["View Assignments", "Submit Assignment"]
+    if isinstance(member, ClubManager):
+        options += ["Add Assignment", "Remove Assignment"]
+    if isinstance(member, ClubAdmin):
+        options += ["Add Member", "Remove Member"]
+
+    options.append("Back")
+
+
+    # options = ["View Assignments", "View Submissions", "Back"]
 
     while True:
         typer.secho(f"\n🏛️  Club: {club.name}", fg=typer.colors.CYAN, bold=True)
@@ -227,6 +246,64 @@ def show_club_menu(club):
                     typer.echo(
                         f"- {s.assignment.title} | Score: {s.score if s.score is not None else 'Not graded'} | Feedback: {s.feedback or 'N/A'}"
                     )
+
+        elif choice == "Add Assignment" and isinstance(member, (ClubManager, ClubAdmin)):
+            title = typer.prompt("Assignment title")
+            max_score = int(typer.prompt("Max score"))
+            deadline_str = typer.prompt("Deadline (YYYY-MM-DD HH:MM)")
+            from datetime import datetime
+            deadline = datetime.strptime(deadline_str, "%Y-%m-%d %H:%M")
+            from assignment import Assignment
+            new_assignment = Assignment(title=title, max_score=max_score, deadline=deadline, club=club, publisher=member)
+            club.add_assignment(new_assignment)
+            typer.secho("✅ Assignment added successfully!", fg=typer.colors.GREEN)
+
+
+        elif choice == "Remove Assignment" and isinstance(member, (ClubManager, ClubAdmin)):
+            assignments = club.view_assignments()
+            if not assignments:
+                typer.secho("📌 No assignments to remove.", fg=typer.colors.MAGENTA)
+                continue
+
+            assignment_titles = [a.title for a in assignments]
+            selected_title = select_option(assignment_titles + ["Back"], "Select assignment to remove:")
+            if selected_title == "Back" or selected_title is None:
+                continue
+
+            selected_assignment = next(a for a in assignments if a.title == selected_title)
+            club.remove_assignment(selected_assignment)
+            typer.secho("✅ Assignment removed successfully!", fg=typer.colors.GREEN)
+
+
+
+        elif choice == "Add Member" and isinstance(member, ClubAdmin):
+            student_enrollment = typer.prompt("Enter enrollment number of the student to add")
+            from student import Student
+            student = db.get_student(student_enrollment)
+            if student:
+                try:
+                    club.add_member(student)
+                    typer.secho(f"✅ {student.name} added to the club.", fg=typer.colors.GREEN)
+                except AlreadyMember:
+                    typer.secho(f"❌ {student.name} is already a member.", fg=typer.colors.RED)
+            else:
+                typer.secho("❌ Student not found.", fg=typer.colors.RED)
+
+        elif choice == "Remove Member" and isinstance(member, ClubAdmin):
+            member_names = [m.student.name for m in club.members if m != member]  # cannot remove self
+            selected_name = select_option(member_names + ["Back"], "Select a member to remove:")
+            if selected_name == "Back" or selected_name is None:
+                continue
+
+            to_remove = next(m.student for m in club.members if m.student.name == selected_name)
+            from errors import NotMember
+            try:
+                club.remove_member(to_remove)
+                typer.secho(f"✅ {selected_name} removed from the club.", fg=typer.colors.GREEN)
+            except NotMember:
+                typer.secho(f"❌ {selected_name} is not a member.", fg=typer.colors.RED)
+
+
         elif choice == "Back" or choice is None:
             break
         
