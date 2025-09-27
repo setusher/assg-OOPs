@@ -56,44 +56,40 @@ def main_menu():
             break
 
 def handle_register():
+    typer.echo("\n" + "="*30)
+    typer.secho("📝 Student Registration", fg=typer.colors.BLUE, bold=True)
+    typer.echo("="*30)
+
+    name = typer.prompt("Enter your full name").strip()
+    enrollment = typer.prompt("Enter enrollment number (8 digits)").strip()
+    password = typer.prompt("🔒 Enter password (min 8 chars)", hide_input=True)
+
+    student = Student(name=name, enrollment=enrollment, password=password)
+
     try:
-        typer.echo("\n" + "="*30)
-        typer.secho("📝 Student Registration", fg=typer.colors.BLUE, bold=True)
-        typer.echo("="*30)
-
-        student = Student()
-
         result = student.register()
+        typer.secho("\n🎉 Registration successful!", fg=typer.colors.GREEN, bold=True)
+        typer.secho(f"Welcome {result.name}! You can now login.", fg=typer.colors.CYAN)
+    except BadFormatException as e:
+        typer.secho(f"\n❌ Registration failed: {e}", fg=typer.colors.RED, bold=True)
+    except InvalidPassword as e:
+        typer.secho(f"\n❌ Registration failed: {e}", fg=typer.colors.RED, bold=True)
 
-        if result:
-            typer.secho("✅ Registration successful!", fg=typer.colors.GREEN, bold=True)
-        else:
-            typer.secho("❌ Registration failed!", fg=typer.colors.RED, bold=True)
-
-    except Exception as e:
-        typer.secho(f"❌ Error during registration: {str(e)}", fg=typer.colors.RED)
-        typer.secho("Please try again or contact support.", fg=typer.colors.YELLOW)
-
+        
 def handle_login():
-    try:
-        typer.echo("\n" + "="*30)
-        typer.secho("📝 Student Registration", fg=typer.colors.BLUE, bold=True)
-        typer.echo("="*30)
+    typer.echo("\n" + "="*30)
+    typer.secho("📝 Student Login", fg=typer.colors.BLUE, bold=True)
+    typer.echo("="*30)
 
-        student = Student()
+    enrollment = typer.prompt("Enrollment number").strip()
+    password = typer.prompt("🔒 Password", hide_input=True)
 
-        result = student.login()
+    student = Student.login(enrollment, password)
 
-        if result:
-            typer.secho("✅ Login successful!", fg=typer.colors.GREEN, bold=True)
-        else:
-            typer.secho("❌ Login failed!", fg=typer.colors.RED, bold=True)
-            typer.secho("Please check your credentials and try again.", fg=typer.colors.YELLOW)
-
-    except:
-        typer.secho(f"❌ Error during login: {str(e)}", fg=typer.colors.RED)
-        typer.secho("Please try again or contact support.", fg=typer.colors.YELLOW)
-
+    if student:
+        typer.secho(f"\n🎉 Welcome back {student.name}!", fg=typer.colors.GREEN, bold=True)
+    else:
+        typer.secho("\n❌ Login failed! Invalid enrollment or password.", fg=typer.colors.RED, bold=True)
 
 if __name__ == "__main__":
     app()
