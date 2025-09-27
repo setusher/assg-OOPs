@@ -1,6 +1,8 @@
 from datetime import datetime
 from typing import Optional
 
+from errors import PermissionDenied
+
 
 class Submission:
     def __init__(self, student: 'Student', assignment: 'Assignment', content: str,
@@ -18,6 +20,8 @@ class Submission:
             raise ValueError(f"Score must be between 0 and {self.assignment.max_score}")
         if grader is None:
             raise ValueError("Grader must be provided when grading a submission")
+        if grader != self.assignment.publisher:
+            raise PermissionDenied()
         self.score = score
         self.feedback = feedback
         self.graded_by = grader

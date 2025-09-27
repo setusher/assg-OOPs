@@ -1,13 +1,10 @@
-from student import Student
-from club import Club
-from assignment import Assignment
-from submission import Submission
-from errors import BadFormatException, InvalidPassword, AlreadyMember
-import datetime
-import typer
-import sys
 import inquirer
-from typing import Optional 
+import typer
+
+from errors import BadFormatException, InvalidPassword
+from student import Student
+
+app = typer.Typer(help="Student Management System")
 
 students = []
 clubs = []
@@ -30,28 +27,23 @@ def select_option(options, message):
     answers = inquirer.prompt(questions)
     return answers['choice'] if answers else None
 
-
-app = typer.Typer()
-
 @app.command()
 def main_menu():
-    options = ["Register", "Login", "Exit"]
-
+    options = ["Register", "login", "Exit"]
     while True:
         typer.echo("\n" + "="*50)
         typer.secho("🎓 Student Management System", fg=typer.colors.CYAN, bold=True)
         typer.echo("="*50)
 
-        choice = select_option(options, "What would you like to do?")
+        choice = select_option(options,"What would you like to choose?")
 
         if choice == "Register":
             handle_register()
         elif choice == "Login":
             handle_login()
         elif choice == "Exit":
-            typer.secho("\n👋 Thank you for using Student Management System!", 
+            typer.secho("\n👋 Thank you for using Student Management System!",
                        fg=typer.colors.GREEN, bold=True)
-            break
         elif choice is None:
             typer.secho("\n👋 Goodbye!", fg=typer.colors.YELLOW)
             break
@@ -75,7 +67,6 @@ def handle_register():
         typer.secho(f"\n❌ Registration failed: {e}", fg=typer.colors.RED, bold=True)
     except InvalidPassword as e:
         typer.secho(f"\n❌ Registration failed: {e}", fg=typer.colors.RED, bold=True)
-
 
 
 def handle_login():

@@ -32,7 +32,7 @@ class Student:
         student = db.get_student(enrollment)
         if student and student.password == password:
             return student
-        return None
+        raise BadFormatException("Invalid credentials!")
 
     def get_clubs(self) -> list['Club']:
         return self.clubs.copy()
