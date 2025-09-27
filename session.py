@@ -19,8 +19,11 @@ class Session(metaclass=SessionMeta):
 
     def login(self, enrollment: str, password: str):
         student = Student.login(enrollment, password)
-        self.current_user = student
-        self.is_logged_in = True
+        if student: 
+            self.current_user = student
+            self.is_logged_in = True
+            return student
+        return None
 
     def logout(self):
         if self.is_logged_in:
