@@ -4,16 +4,15 @@ from database import Database
 from session import Session
 from errors import BadFormatException, InvalidPassword
 from student import Student
-import typer
 import sys
-import inquirer
 from typing import Optional
+
 
 app = typer.Typer(help="Student Management System")
 db = Database()
 session  =Session()
 students = db.get_students()
-clubs = []
+clubs = db.get_clubs()
 current_user = None
 
 def find_student(enrollment):
@@ -92,7 +91,7 @@ def handle_login():
         typer.secho("\n❌ Login failed! Invalid enrollment or password.", fg=typer.colors.RED, bold=True)
   
 def show_dashboard():
-    dashboard_options = ["All Clubs", "My Clubs", "My Assignments", "My Submissions"]
+    dashboard_options = ["All Clubs", "My Clubs", "My Assignments", "My Submissions", "Logout"]
     while True:
         while True:
             typer.echo("\n" + "="*50)
@@ -109,19 +108,57 @@ def show_dashboard():
                 show_my_assgs()
             elif choice == "My Submissions":
                 show_my_subs()
-                break
+            elif choice == "Logout":
+                session.logout()
+                typer.secho("👋 Logged out successfully.", fg=typer.colors.YELLOW)
 
 def show_all_clubs():
-    pass
+    if not db.clubs:
+        typer.secho("\n📌 No clubs available yet!", fg=typer.colors.MAGENTA)
+        return
+
+    typer.secho("\n📋 Available Clubs:", fg=typer.colors.BLUE, bold=True)
+    for c in db.clubs:
+        typer.echo(f"- {c.name}")
+
 
 def show_my_clubs():
-    pass
+    student = session.get_current_user()
+    clubs = student.get_clubs()
+
+    if not clubs:
+        typer.secho("\n📌 You are not part of any clubs yet.", fg=typer.colors.MAGENTA)
+        return
+
+    typer.secho("\n📋 My Clubs:", fg=typer.colors.BLUE, bold=True)
+    for c in clubs:
+        typer.echo(f"- {c.name}")
 
 def show_my_assgs():
-    pass
+    student = session.get_current_user()
+    assignments = student.get_assignments()
+
+    if not assignments:
+        typer.secho("\n📌 No assignments yet.", fg=typer.colors.MAGENTA)
+        return
+
+    typer.secho("\n📋 My Assignments:", fg=typer.colors.BLUE, bold=True)
+    for a in assignments:
+        status = "✅ Done" if any(s.assignment == a for s in student.get_submissions()) else "❌ Pending"
+        typer.echo(f"- {a.title} | Max Score: {a.max_score} | Deadline: {a.deadline} | {status}")
 
 def show_my_subs():
-    pass
+    student = session.get_current_user()
+    submissions = student.get_submissions()
+
+    if not submissions: 
+        typer.secho("\n📌 No submissions yet.", fg=typer.colors.MAGENTA)
+        return
+    typer.secho("\n📋 My Submissions:", fg=typer.colors.BLUE, bold=True)
+    for s in submissions:
+        typer.echo(
+             f"- {s.assignment.title} | Score: {s.score if s.score is None else 'Not Graded'} | Feedback: {s.feedback or 'N/A'}"
+        )
 
         
 
