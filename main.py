@@ -133,8 +133,17 @@ def show_my_clubs():
         return
 
     typer.secho("\n📋 My Clubs:", fg=typer.colors.BLUE, bold=True)
-    for c in clubs:
-        typer.echo(f"- {c.name}")
+    club_names = [c.name for c in clubs]
+    selected_club_name = select_option(club_names + ["Back"], "Select a club: ")
+
+    if selected_club_name == "Back" or selected_club_name is None:
+        return
+
+    selected_club = next((c for c in clubs if c.name == selected_club_name), None)
+    
+    show_club_menu(selected_club)
+
+
 
 def show_my_assgs():
     student = session.get_current_user()
@@ -185,9 +194,41 @@ def create_club():
 
     typer.secho(f"✅ Club '{new_club.name}' created successfully! You are the admin.", fg=typer.colors.GREEN)
 
+def show_club_menu(club):
+    options = ["View Assignments", "View Submissions", "Back"]
+
+    while True:
+        typer.secho(f"\n🏛️  Club: {club.name}", fg=typer.colors.CYAN, bold=True)
+        choice = select_option(options, "Choose an action:")
+
+        if choice == "View Assignments":
+            assignments = club.view_assignments()
+            if not assignments:
+                typer.secho("📌 No assignments yet.", fg=typer.colors.MAGENTA)
+            else:
+                typer.secho("\n📋 Assignments:", fg=typer.colors.BLUE, bold=True)
+                for a in assignments:
+                    typer.echo(f"- {a.title} | Max Score: {a.max_score} | Deadline: {a.deadline}")
+
+        elif choice == "View Submissions":
+            submissions = []
+
+            member = club.get_member(session.get_current_user())
+            if member:
+                for a in club.view_assignments():
+                    submissions.extend([s for s in a.submissions if s.student == session.get_current_user()])
 
 
-
+            if not submissions:
+                typer.secho("📌 No submissions yet.", fg=typer.colors.MAGENTA)
+            else:
+                typer.secho("\n📋 Submissions:", fg=typer.colors.BLUE, bold=True)
+                for s in submissions:
+                    typer.echo(
+                        f"- {s.assignment.title} | Score: {s.score if s.score is not None else 'Not graded'} | Feedback: {s.feedback or 'N/A'}"
+                    )
+        elif choice == "Back" or choice is None:
+            break
         
 
 
