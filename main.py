@@ -1,13 +1,12 @@
 from student import Student
-from club import Club
 from assignment import Assignment
 from submission import Submission
-from errors import BadFormatException, InvalidPassword, AlreadyMemberException
 import datetime
 
 students = []
 club = []
 current_user = None
+
 
 def main():
     global curr_user
@@ -15,10 +14,9 @@ def main():
     while True:
         print("Options: register, login, create_club, join_club, add_assignment")
         cmd = input("> ").strip().lower()
-        if cmd =="exit":
+        if cmd == "exit":
             break
 
-        
 
 if __name__ == "__main__":
     main()

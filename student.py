@@ -41,8 +41,10 @@ class Student:
     def get_clubs(self) -> list[Club]:
         return self.clubs.copy()
 
-    def get_assignments(self):
-        pass
+    def get_assignments(self) -> list[Assignment]:
+        assignments = [x for x in db.assignments if x.club in self.clubs]
+        return assignments.copy()
 
     def get_submissions(self) -> list[Submission]:
-        pass
+        sub = [x for x in db.submissions if x.student == self]
+        return sub.copy()

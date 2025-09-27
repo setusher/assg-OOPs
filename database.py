@@ -30,6 +30,9 @@ class Database(metaclass=DatabaseMeta):
     def get_student(self, enrollment: str) -> Optional[Student]:
         return self.students.get(enrollment)
 
+    def update_student(self, student: Student):
+        self.students[student.enrollment] = student
+
     def add_club(self, club: Club):
         self.clubs.append(club)
 
