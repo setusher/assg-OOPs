@@ -1,5 +1,4 @@
 from typing import TypeVar
-
 from database import Database
 from errors import BadFormatException, InvalidPassword
 
