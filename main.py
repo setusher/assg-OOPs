@@ -279,6 +279,7 @@ def show_club_menu(club):
         elif choice == "Add Member" and isinstance(member, ClubAdmin):
             student_enrollment = typer.prompt("Enter enrollment number of the student to add")
             from student import Student
+            from errors import AlreadyMember
             student = db.get_student(student_enrollment)
             if student:
                 try:

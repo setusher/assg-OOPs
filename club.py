@@ -24,10 +24,18 @@ class Club:
         db.add_club(self)
 
     def add_member(self, student: 'Student') -> 'ClubMember':
+        from club_member import ClubMember
+        from errors import AlreadyMember
+
         if self.is_member(student):
             raise AlreadyMember()
+        
         member = ClubMember(student, self)
         self.members.append(member)
+
+        if self not in student.clubs:
+            student.clubs.append(self)
+
         return member
 
     def remove_member(self, student: 'Student'):
