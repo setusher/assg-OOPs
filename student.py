@@ -49,6 +49,9 @@ class Student:
         return sub.copy()
 
     def create_club(self, name: str):
+        if any(x.club.name == name for x in db.get_clubs()):
+            raise BadFormatException("Club with same name already exists!")
+
         session = Session()
         club = Club(name, session.current_user)
         db.add_club(club)
