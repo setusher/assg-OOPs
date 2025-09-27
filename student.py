@@ -5,6 +5,7 @@ from database import Database
 from errors import BadFormatException, InvalidPassword
 from session import Session
 
+
 T = TypeVar('T')
 
 db = Database()
