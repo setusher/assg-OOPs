@@ -1,9 +1,6 @@
 from datetime import datetime
 from typing import TypeVar
 
-# from club import Club
-# from submission import Submission
-
 T = TypeVar('T')
 
 

@@ -1,12 +1,8 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-# from assignment import Assignment
-# from club import Club
 from database import Database
 from errors import AlreadyMember, PermissionDenied
-# from student import Student
-# from submission import Submission
 
 if TYPE_CHECKING:
     from assignment import Assignment
@@ -34,7 +30,7 @@ class ClubMember:
 # Admin capabilities minus the add/remove member
 class ClubManager(ClubMember):
 
-    def add_assignment(self, title: str, max_score: int, deadline: str) -> 'Assignment':
+    def add_assignment(self, title: str, max_score: int, deadline: datetime) -> 'Assignment':
         assignment = Assignment(title, max_score, deadline, self.club)
         self.club.assignments.append(assignment)
         return assignment

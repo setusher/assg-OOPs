@@ -1,10 +1,5 @@
 from typing import TypeVar, Optional, List, Dict
 
-# from assignment import Assignment
-# from club import Club
-# from student import Student
-# from submission import Submission
-
 T = TypeVar('T')
 
 

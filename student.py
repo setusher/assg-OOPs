@@ -1,10 +1,7 @@
 from typing import TypeVar
 
-# from assignment import Assignment
-# from club import Club
 from database import Database
 from errors import BadFormatException, InvalidPassword
-# from submission import Submission
 
 T = TypeVar('T')
 

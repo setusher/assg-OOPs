@@ -1,9 +1,6 @@
 from datetime import datetime
 from typing import Optional
 
-# from assignment import Assignment
-# from student import Student
-
 
 class Submission:
     def __init__(self, student: 'Student', assignment: 'Assignment', content: str,

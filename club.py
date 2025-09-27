@@ -1,15 +1,6 @@
-# from assignment import Assignment
-# from club_member import ClubAdmin, ClubMember
+from club_member import ClubMember
 from database import Database
 from errors import AlreadyMember, NotMember
-# from student import Student
-
-from typing import TYPE_CHECKING
-if TYPE_CHECKING:
-    from assignment import Assignment
-    from club import Club
-    from student import Student
-    from submission import Submission
 
 db = Database()
 
