@@ -1,18 +1,18 @@
-from assignment import Assignment
-from club_member import ClubAdmin, ClubMember
+from club_member import ClubMember
 from database import Database
 from errors import AlreadyMember, NotMember
-from student import Student
 
 db = Database()
 
 
 class Club:
-    def __init__(self, name: str, admin: Student, assignments: list[Assignment] = None):
+    def __init__(self, name: str, admin: 'Student', assignments: list['Assignment'] = None):
         self.name = name
-        self.admin: Student = admin
-        self.members: list[ClubMember] = []
-        self.assignments: list[Assignment] = assignments or []
+        self.admin: 'Student' = admin
+        self.members: list['ClubMember'] = []
+        self.assignments: list['Assignment'] = assignments or []
+
+        from club_member import ClubAdmin, ClubMember
 
         admin_m = ClubAdmin(admin, self)
         self.members.append(admin_m)
@@ -20,14 +20,14 @@ class Club:
 
         db.add_club(self)
 
-    def add_member(self, student: Student) -> ClubMember:
+    def add_member(self, student: 'Student') -> 'ClubMember':
         if self.is_member(student):
             raise AlreadyMember()
         member = ClubMember(student, self)
         self.members.append(member)
         return member
 
-    def remove_member(self, student: Student):
+    def remove_member(self, student: 'Student'):
         to_rem = None
         for m in self.members:
             if m.student == student:
@@ -45,5 +45,5 @@ class Club:
     def view_assignments(self):
         return self.assignments.copy()
 
-    def is_member(self, student: Student) -> bool:
+    def is_member(self, student: 'Student') -> bool:
         return any(m.student == student for m in self.members)

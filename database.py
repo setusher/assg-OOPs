@@ -1,10 +1,5 @@
 from typing import TypeVar, Optional, List, Dict
 
-from assignment import Assignment
-from club import Club
-from student import Student
-from submission import Submission
-
 T = TypeVar('T')
 
 
@@ -19,22 +14,22 @@ class DatabaseMeta(type):
 
 class Database(metaclass=DatabaseMeta):
     def __init__(self):
-        self.students: Dict[str, Student] = {}  # key is enrollment
-        self.clubs: List[Club] = []
-        self.assignments: List[Assignment] = []
-        self.submissions: List[Submission] = []
+        self.students: Dict[str, 'Student'] = {}  # key is enrollment
+        self.clubs: List['Club'] = []
+        self.assignments: List['Assignment'] = []
+        self.submissions: List['Submission'] = []
 
-    def add_student(self, student: Student):
+    def add_student(self, student: 'Student'):
         self.students[student.enrollment] = student
 
-    def get_student(self, enrollment: str) -> Optional[Student]:
+    def get_student(self, enrollment: str) -> Optional['Student']:
         return self.students.get(enrollment)
 
     def update_student(self, student: Student):
         self.students[student.enrollment] = student
 
-    def add_club(self, club: Club):
+    def add_club(self, club: 'Club'):
         self.clubs.append(club)
 
-    def get_clubs(self) -> List[Club]:
+    def get_clubs(self) -> List['Club']:
         return self.clubs.copy()

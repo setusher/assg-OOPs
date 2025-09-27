@@ -1,10 +1,7 @@
 from typing import TypeVar
 
-from assignment import Assignment
-from club import Club
 from database import Database
 from errors import BadFormatException, InvalidPassword
-from submission import Submission
 
 T = TypeVar('T')
 
@@ -38,13 +35,13 @@ class Student:
             return student
         return None
 
-    def get_clubs(self) -> list[Club]:
+    def get_clubs(self) -> list['Club']:
         return self.clubs.copy()
 
-    def get_assignments(self) -> list[Assignment]:
+    def get_assignments(self) -> list['Assignment']:
         assignments = [x for x in db.assignments if x.club in self.clubs]
         return assignments.copy()
 
-    def get_submissions(self) -> list[Submission]:
+    def get_submissions(self) -> list['Submission']:
         sub = [x for x in db.submissions if x.student == self]
         return sub.copy()
