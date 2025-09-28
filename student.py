@@ -12,9 +12,10 @@ db = Database()
 
 class Student:
     def __init__(self: T, enrollment: str, name: str, password: str):
+        from vector import Vector
         self.enrollment = enrollment
         self.name = name
-        self.clubs = []
+        self.clubs = Vector()
         self.password = password
 
     def register(self) -> T:

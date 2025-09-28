@@ -13,11 +13,13 @@ class DatabaseMeta(type):
 
 
 class Database(metaclass=DatabaseMeta):
+    
     def __init__(self):
+        from vector import Vector
         self.students: Dict[str, 'Student'] = {}  # key is enrollment
-        self.clubs: List['Club'] = []
-        self.assignments: List['Assignment'] = []
-        self.submissions: List['Submission'] = []
+        self.clubs: Vector['Club'] = Vector()
+        self.assignments: Vector['Assignment'] = Vector()
+        self.submissions: Vector['Submission'] = Vector()
 
     def add_student(self, student: 'Student'):
         self.students[student.enrollment] = student
@@ -25,7 +27,7 @@ class Database(metaclass=DatabaseMeta):
     def get_student(self, enrollment: str) -> Optional['Student']:
         return self.students.get(enrollment)
 
-    def get_students(self) -> List['Students']:
+    def get_students(self) -> list['Students']:
         return self.students.copy()
 
     def update_student(self, student: 'Student'):
@@ -34,5 +36,15 @@ class Database(metaclass=DatabaseMeta):
     def add_club(self, club: 'Club'):
         self.clubs.append(club)
 
-    def get_clubs(self) -> List['Club']:
+    def get_clubs(self) -> list['Club']:
         return self.clubs.copy()
+
+    def add_submission(self, submission: 'Submission') -> None:
+        
+        self.submissions.append(submission)
+
+    def get_submissions(self):
+        try:
+            return self.submissions.copy()
+        except Exception:
+            return self.submissions

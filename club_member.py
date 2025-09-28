@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from database import Database
+# from database import Database
 from errors import NotMember, BadFormatException
 
 if TYPE_CHECKING:
@@ -10,20 +10,21 @@ if TYPE_CHECKING:
     from student import Student
     from submission import Submission
 
-db = Database()
+# db = Database()
 
 
 # Manager capabilities minus the add assignments
 class ClubMember:
     def __init__(self, student: 'Student', club: 'Club'):
+        from vector import Vector
         self.student = student
         self.club = club
         self.joined_date = datetime.now()
 
-    def view_club_assignments(self) -> ['Assignment']:
+    def view_club_assignments(self) -> list['Assignment']:
         return self.club.view_assignments()
 
-    def view_my_submissions(self) -> ['Submission']:
+    def view_my_submissions(self) -> list['Submission']:
         return [s for s in self.student.get_submissions() if s.assignment.club == self.club]
 
 
@@ -45,13 +46,13 @@ class ClubAdmin(ClubManager):
     def add_member(self, student: 'Student') -> ClubMember:
         member = self.club.add_member(student)
         student.clubs.append(self.club)
-        db.update_student(student)
+        Database().update_student(student)
         return member
 
     def remove_member(self, student: 'Student'):
         self.club.remove_member(student)
         student.clubs.remove(self.club)
-        db.update_student(student)
+        Database().update_student(student)
 
     def promote_member(self, member):
         
