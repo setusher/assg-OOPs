@@ -13,20 +13,6 @@ db = Database()
 session = Session()
 
 
-def find_student(enrollment):
-    for student in db.get_students():
-        if student.enrollment == enrollment:
-            return student
-    return None
-
-
-def find_club(name):
-    for club in db.get_clubs():
-        if club.name == name:
-            return club
-    return None
-
-
 def select_option(options, message):
     questions = [inquirer.List('choice', message=message, choices=options)]
     answers = inquirer.prompt(questions)
