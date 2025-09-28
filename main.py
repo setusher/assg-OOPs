@@ -50,7 +50,7 @@ def main_menu():
             handle_login()
         elif choice == "Exit":
             typer.secho("\n👋 Thank you for using Student Management System!",
-                       fg=typer.colors.GREEN, bold=True)
+                        fg=typer.colors.GREEN, bold=True)
             break
         elif choice is None:
             typer.secho("\n👋 Goodbye!", fg=typer.colors.YELLOW)
