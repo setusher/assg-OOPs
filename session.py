@@ -3,6 +3,7 @@ from typing import Optional
 from errors import NoUserLoggedIn
 from student import Student
 
+
 class SessionMeta(type):
     _instance = None
 
@@ -19,7 +20,7 @@ class Session(metaclass=SessionMeta):
 
     def login(self, enrollment: str, password: str):
         student = Student.login(enrollment, password)
-        if student: 
+        if student:
             self.current_user = student
             self.is_logged_in = True
             return student

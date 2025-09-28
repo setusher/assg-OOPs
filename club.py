@@ -3,7 +3,7 @@ from typing import Optional
 from assignment import Assignment
 from club_member import ClubMember
 from database import Database
-from errors import AlreadyMember, NotMember
+from errors import NotMember
 
 db = Database()
 
@@ -29,7 +29,7 @@ class Club:
 
         if self.is_member(student):
             raise AlreadyMember()
-        
+
         member = ClubMember(student, self)
         self.members.append(member)
 

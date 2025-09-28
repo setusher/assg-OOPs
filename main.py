@@ -1,19 +1,18 @@
 import inquirer
 import typer
-from database import Database
-from session import Session
-from errors import BadFormatException, InvalidPassword
-from student import Student
-import sys
-from typing import Optional
 
+from database import Database
+from errors import BadFormatException, InvalidPassword
+from session import Session
+from student import Student
 
 app = typer.Typer(help="Student Management System")
 db = Database()
-session  =Session()
+session = Session()
 students = db.get_students()
 clubs = db.get_clubs()
 current_user = None
+
 
 def find_student(enrollment):
     for student in students:
@@ -21,26 +20,29 @@ def find_student(enrollment):
             return student
     return None
 
+
 def find_club(name):
     for club in clubs:
         if club.name == name:
             return club
     return None
 
+
 def select_option(options, message):
     questions = [inquirer.List('choice', message=message, choices=options)]
     answers = inquirer.prompt(questions)
     return answers['choice'] if answers else None
 
+
 @app.command()
 def main_menu():
     options = ["Register", "Login", "Exit"]
     while True:
-        typer.echo("\n" + "="*50)
+        typer.echo("\n" + "=" * 50)
         typer.secho("🎓 Student Management System", fg=typer.colors.CYAN, bold=True)
-        typer.echo("="*50)
+        typer.echo("=" * 50)
 
-        choice = select_option(options,"What would you like to choose?")
+        choice = select_option(options, "What would you like to choose?")
 
         if choice == "Register":
             handle_register()
@@ -48,15 +50,16 @@ def main_menu():
             handle_login()
         elif choice == "Exit":
             typer.secho("\n👋 Thank you for using Student Management System!",
-                       fg=typer.colors.GREEN, bold=True)
+                        fg=typer.colors.GREEN, bold=True)
         elif choice is None:
             typer.secho("\n👋 Goodbye!", fg=typer.colors.YELLOW)
             break
 
+
 def handle_register():
-    typer.echo("\n" + "="*30)
+    typer.echo("\n" + "=" * 30)
     typer.secho("📝 Student Registration", fg=typer.colors.BLUE, bold=True)
-    typer.echo("="*30)
+    typer.echo("=" * 30)
 
     name = typer.prompt("Enter your full name").strip()
     enrollment = typer.prompt("Enter enrollment number (8 digits)").strip()
@@ -75,9 +78,9 @@ def handle_register():
 
 
 def handle_login():
-    typer.echo("\n" + "="*30)
+    typer.echo("\n" + "=" * 30)
     typer.secho("📝 Student Login", fg=typer.colors.BLUE, bold=True)
-    typer.echo("="*30)
+    typer.echo("=" * 30)
 
     enrollment = typer.prompt("Enrollment number").strip()
     password = typer.prompt("🔒 Password", hide_input=True)
@@ -89,16 +92,17 @@ def handle_login():
         show_dashboard()
     else:
         typer.secho("\n❌ Login failed! Invalid enrollment or password.", fg=typer.colors.RED, bold=True)
-  
+
+
 def show_dashboard():
     dashboard_options = ["All Clubs", "My Clubs", "My Assignments", "My Submissions", "Create Club", "Logout"]
     while True:
         while True:
-            typer.echo("\n" + "="*50)
+            typer.echo("\n" + "=" * 50)
             typer.secho("Student Dashboard", fg=typer.colors.CYAN, bold=True)
-            typer.echo("="*50)
+            typer.echo("=" * 50)
 
-            choice = select_option(dashboard_options,"What would you like to choose?")
+            choice = select_option(dashboard_options, "What would you like to choose?")
 
             if choice == "All Clubs":
                 show_all_clubs()
@@ -109,11 +113,12 @@ def show_dashboard():
             elif choice == "My Submissions":
                 show_my_subs()
             elif choice == "Create Club":
-                create_club()    
+                create_club()
             elif choice == "Logout":
                 session.logout()
                 typer.secho("👋 Logged out successfully.", fg=typer.colors.YELLOW)
                 return
+
 
 def show_all_clubs():
     if not db.clubs:
@@ -141,9 +146,8 @@ def show_my_clubs():
         return
 
     selected_club = next((c for c in clubs if c.name == selected_club_name), None)
-    
-    show_club_menu(selected_club)
 
+    show_club_menu(selected_club)
 
 
 def show_my_assgs():
@@ -159,26 +163,28 @@ def show_my_assgs():
         status = "✅ Done" if any(s.assignment == a for s in student.get_submissions()) else "❌ Pending"
         typer.echo(f"- {a.title} | Max Score: {a.max_score} | Deadline: {a.deadline} | {status}")
 
+
 def show_my_subs():
     student = session.get_current_user()
     submissions = student.get_submissions()
 
-    if not submissions: 
+    if not submissions:
         typer.secho("\n📌 No submissions yet.", fg=typer.colors.MAGENTA)
         return
     typer.secho("\n📋 My Submissions:", fg=typer.colors.BLUE, bold=True)
     for s in submissions:
         typer.echo(
-             f"- {s.assignment.title} | Score: {s.score if s.score is None else 'Not Graded'} | Feedback: {s.feedback or 'N/A'}"
+            f"- {s.assignment.title} | Score: {s.score if s.score is None else 'Not Graded'} | Feedback: {s.feedback or 'N/A'}"
         )
 
+
 def create_club():
-    typer.echo("\n" + "="*30)
+    typer.echo("\n" + "=" * 30)
     typer.secho("📝 Create Club", fg=typer.colors.BLUE, bold=True)
-    typer.echo("="*30)
+    typer.echo("=" * 30)
 
     student = session.get_current_user()
-    
+
     # typer.secho("\n📝 Create a New Club", fg=typer.colors.BLUE, bold=True)
 
     name = typer.prompt("Enter club name").strip()
@@ -188,15 +194,15 @@ def create_club():
         typer.secho("❌ A club with this name already exists.", fg=typer.colors.RED)
         return
 
-
     from club import Club
-    new_club = Club(name=name, admin=student)    
+    new_club = Club(name=name, admin=student)
     db.clubs.append(new_club)
 
     typer.secho(f"✅ Club '{new_club.name}' created successfully! You are the admin.", fg=typer.colors.GREEN)
 
+
 def show_club_menu(club):
-    from club_member import ClubAdmin, ClubManager, ClubMember
+    from club_member import ClubAdmin, ClubManager
 
     student = session.get_current_user()
     member = club.get_member(student)
@@ -212,7 +218,6 @@ def show_club_menu(club):
         options += ["Add Member", "Remove Member"]
 
     options.append("Back")
-
 
     # options = ["View Assignments", "View Submissions", "Back"]
 
@@ -237,7 +242,6 @@ def show_club_menu(club):
                 for a in club.view_assignments():
                     submissions.extend([s for s in a.submissions if s.student == session.get_current_user()])
 
-
             if not submissions:
                 typer.secho("📌 No submissions yet.", fg=typer.colors.MAGENTA)
             else:
@@ -254,7 +258,8 @@ def show_club_menu(club):
             from datetime import datetime
             deadline = datetime.strptime(deadline_str, "%Y-%m-%d %H:%M")
             from assignment import Assignment
-            new_assignment = Assignment(title=title, max_score=max_score, deadline=deadline, club=club, publisher=member)
+            new_assignment = Assignment(title=title, max_score=max_score, deadline=deadline, club=club,
+                                        publisher=member)
             club.add_assignment(new_assignment)
             typer.secho("✅ Assignment added successfully!", fg=typer.colors.GREEN)
 
@@ -307,12 +312,7 @@ def show_club_menu(club):
 
         elif choice == "Back" or choice is None:
             break
-        
 
-
-
-
-    
 
 if __name__ == "__main__":
     app()

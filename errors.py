@@ -21,6 +21,7 @@ class PermissionDenied(Exception):
     def __init__(self):
         super().__init__("You don't have permission to perform this action!")
 
+
 class NoUserLoggedIn(Exception):
     def __init__(self):
         super().__init__("No user is logged in!")
