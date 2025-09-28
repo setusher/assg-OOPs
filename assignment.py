@@ -37,3 +37,8 @@ class Assignment:
 
     def is_late(self, submission_date: datetime) -> bool:
         return submission_date > self.deadline
+
+    def __eq__(self, other):
+        if isinstance(other, Assignment):
+            return self.title == other.title and self.club == other.club
+        return NotImplemented

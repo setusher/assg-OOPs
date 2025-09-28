@@ -62,3 +62,8 @@ class Club:
             if m.student == student:
                 return m
         return None
+
+    def __eq__(self, other):
+        if isinstance(other, Club):
+            return self.name == other.name
+        return NotImplemented

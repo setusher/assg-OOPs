@@ -24,7 +24,7 @@ class Database(metaclass=DatabaseMeta):
         return self.students.get(enrollment)
 
     def get_students(self) -> List['Students']:
-        return self.students.copy()
+        return list(self.students.values())
 
     def update_student(self, student: 'Student'):
         self.students[student.enrollment] = student

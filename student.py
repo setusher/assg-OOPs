@@ -58,7 +58,7 @@ class Student:
         return sub
 
     def create_club(self, name: str):
-        if any(x.club.name == name for x in db.get_clubs()):
+        if any(x.name == name for x in db.get_clubs()):
             raise BadFormatException("Club with same name already exists!")
 
         club = Club(name, self)

@@ -28,3 +28,8 @@ class Submission:
 
     def is_late(self) -> bool:
         return self.assignment.is_late(self.submission_date)
+
+    def __eq__(self, other):
+        if isinstance(other, Submission):
+            return self.student == other.student and self.assignment == other.assignment
+        return NotImplemented
