@@ -4,7 +4,6 @@ from club import Club
 from database import Database
 from errors import BadFormatException, InvalidPassword
 
-
 T = TypeVar('T')
 
 db = Database()
@@ -18,8 +17,8 @@ class Student:
         self.password = password
 
     def register(self) -> T:
-        if len(self.name) < 1 or len(self.enrollment) != 8:
-            raise BadFormatException()
+        if len(self.name) < 1 or len(self.enrollment) != 8 or not self.enrollment.isdigit():
+            raise BadFormatException("Invalid name or enrollment number!")
 
         if len(self.password) < 8:
             raise InvalidPassword()

@@ -9,20 +9,17 @@ from student import Student
 app = typer.Typer(help="Student Management System")
 db = Database()
 session = Session()
-students = db.get_students()
-clubs = db.get_clubs()
-current_user = None
 
 
 def find_student(enrollment):
-    for student in students:
+    for student in db.get_students():
         if student.enrollment == enrollment:
             return student
     return None
 
 
 def find_club(name):
-    for club in clubs:
+    for club in db.get_clubs():
         if club.name == name:
             return club
     return None
@@ -71,10 +68,12 @@ def handle_register():
     try:
         result = student.register()
         typer.secho("\n🎉 Registration successful!", fg=typer.colors.GREEN, bold=True)
-        typer.secho(f"Welcome {result.name}! You can now login.", fg=typer.colors.CYAN)
-    except BadFormatException as e:
-        typer.secho(f"\n❌ Registration failed: {e}", fg=typer.colors.RED, bold=True)
+        session.login(result.enrollment, result.password)
+        typer.secho(f"Welcome {result.name}! You are now logged in!", fg=typer.colors.CYAN)
+        show_dashboard()
     except InvalidPassword as e:
+        typer.secho(f"\n❌ Registration failed: {e}", fg=typer.colors.RED, bold=True)
+    except BadFormatException as e:
         typer.secho(f"\n❌ Registration failed: {e}", fg=typer.colors.RED, bold=True)
 
 
@@ -122,31 +121,31 @@ def show_dashboard():
 
 
 def show_all_clubs():
-    if not db.clubs:
+    clubs = db.get_clubs()
+    if not clubs:
         typer.secho("\n📌 No clubs available yet!", fg=typer.colors.MAGENTA)
         return
 
     typer.secho("\n📋 Available Clubs:", fg=typer.colors.BLUE, bold=True)
-    for c in db.clubs:
+    for c in clubs:
         typer.echo(f"- {c.name}")
 
 
 def show_my_clubs():
-    student = session.get_current_user()
-    clubs = student.get_clubs()
+    user_clubs = session.current_user.get_clubs()
 
-    if not clubs:
+    if not user_clubs:
         typer.secho("\n📌 You are not part of any clubs yet.", fg=typer.colors.MAGENTA)
         return
 
     typer.secho("\n📋 My Clubs:", fg=typer.colors.BLUE, bold=True)
-    club_names = [c.name for c in clubs]
+    club_names = [c.name for c in user_clubs]
     selected_club_name = select_option(club_names + ["Back"], "Select a club: ")
 
     if selected_club_name == "Back" or selected_club_name is None:
         return
 
-    selected_club = next((c for c in clubs if c.name == selected_club_name), None)
+    selected_club = next((c for c in user_clubs if c.name == selected_club_name), None)
 
     show_club_menu(selected_club)
 
@@ -183,23 +182,13 @@ def create_club():
     typer.echo("\n" + "=" * 30)
     typer.secho("📝 Create Club", fg=typer.colors.BLUE, bold=True)
     typer.echo("=" * 30)
-
-    student = session.get_current_user()
-
-    # typer.secho("\n📝 Create a New Club", fg=typer.colors.BLUE, bold=True)
-
     name = typer.prompt("Enter club name").strip()
-    description = typer.prompt("Enter club description").strip()
+    try:
+        session.current_user.create_club(name)
+    except BadFormatException as e:
+        typer.secho(f"❌ {e}", fg=typer.colors.RED)
 
-    if any(c.name == name for c in db.clubs):
-        typer.secho("❌ A club with this name already exists.", fg=typer.colors.RED)
-        return
-
-    from club import Club
-    new_club = Club(name=name, admin=student)
-    db.clubs.append(new_club)
-
-    typer.secho(f"✅ Club '{new_club.name}' created successfully! You are the admin.", fg=typer.colors.GREEN)
+    typer.secho(f"✅ Club '{name}' created successfully! You are the admin.", fg=typer.colors.GREEN)
 
 
 def show_club_menu(club):
