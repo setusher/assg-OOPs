@@ -4,7 +4,6 @@ from typing import TypeVar
 from club_member import ClubManager, ClubMember
 from database import Database
 from errors import PermissionDenied
-from session import Session
 from submission import Submission
 
 T = TypeVar('T')
@@ -26,6 +25,7 @@ class Assignment:
         return s
 
     def view_submissions(self) -> list['Submission']:
+        from session import Session
         session = Session()
         mem = self.club.get_member(session.current_user)
         if mem is None:

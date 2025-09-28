@@ -33,6 +33,7 @@ class Club:
         member = ClubMember(student, self)
         self.members.append(member)
 
+
         if self not in student.clubs:
             student.clubs.append(self)
 

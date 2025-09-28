@@ -50,7 +50,8 @@ def main_menu():
             handle_login()
         elif choice == "Exit":
             typer.secho("\n👋 Thank you for using Student Management System!",
-                        fg=typer.colors.GREEN, bold=True)
+                       fg=typer.colors.GREEN, bold=True)
+            break
         elif choice is None:
             typer.secho("\n👋 Goodbye!", fg=typer.colors.YELLOW)
             break
@@ -211,11 +212,11 @@ def show_club_menu(club):
         typer.secho("❌ You are not a member of this club.", fg=typer.colors.RED)
         return
 
-    options = ["View Assignments", "Submit Assignment"]
+    options = ["View Assignments", "View Submissions", "View members"]
     if isinstance(member, ClubManager):
         options += ["Add Assignment", "Remove Assignment"]
     if isinstance(member, ClubAdmin):
-        options += ["Add Member", "Remove Member"]
+        options += ["Add Member", "Remove Member", "Promote Member"]
 
     options.append("Back")
 
@@ -229,10 +230,36 @@ def show_club_menu(club):
             assignments = club.view_assignments()
             if not assignments:
                 typer.secho("📌 No assignments yet.", fg=typer.colors.MAGENTA)
-            else:
-                typer.secho("\n📋 Assignments:", fg=typer.colors.BLUE, bold=True)
-                for a in assignments:
-                    typer.echo(f"- {a.title} | Max Score: {a.max_score} | Deadline: {a.deadline}")
+                continue
+
+            assignment_titles = [a.title for a in assignments]
+            selected_title = select_option(assignment_titles + ["Back"], "Select an assignment:")
+
+            if selected_title == "Back" or selected_title is None:
+                continue
+
+            selected_assignment = next(a for a in assignments if a.title == selected_title)
+
+            while True:
+                typer.secho(f"\n Assignment: {selected_assignment.title}", fg=typer.colors.BLUE, bold=True)
+                sub_options = ["Submit Assignment", "Back"]
+                sub_choice = select_option(sub_options, "Choose an action:")
+
+                if sub_choice == "Submit Assignment":
+
+                    content = typer.prompt("Enter your submission text")
+                    from submission import Submission
+                    student = session.get_current_user()
+
+                    submission = Submission(student=student, assignment=selected_assignment, content=content)
+                    selected_assignment.add_submission(submission)
+
+                    typer.secho("✅ Submission added successfully!", fg=typer.colors.GREEN)
+                    break
+
+                elif sub_choice == "Back" or sub_choice is None:
+                    break
+
 
         elif choice == "View Submissions":
             submissions = []
@@ -250,6 +277,23 @@ def show_club_menu(club):
                     typer.echo(
                         f"- {s.assignment.title} | Score: {s.score if s.score is not None else 'Not graded'} | Feedback: {s.feedback or 'N/A'}"
                     )
+
+        elif choice == "View members":
+            if not club.members:
+                typer.secho("📌 No members in this club yet.", fg=typer.colors.MAGENTA)
+                continue
+
+            typer.secho("\n📋 Club Members:", fg=typer.colors.BLUE, bold=True)
+            for m in club.members:
+                role = ""
+                from club_member import ClubAdmin, ClubManager
+                if isinstance(m, ClubAdmin):
+                    role = typer.style("(Admin)", fg=typer.colors.RED, bold=True)
+                elif isinstance(m, ClubManager):
+                    role = typer.style("(Manager)", fg=typer.colors.YELLOW, bold=True)
+
+                typer.echo(f"- {m.student.name} {role}")
+
 
         elif choice == "Add Assignment" and isinstance(member, (ClubManager, ClubAdmin)):
             title = typer.prompt("Assignment title")
@@ -308,6 +352,38 @@ def show_club_menu(club):
                 typer.secho(f"✅ {selected_name} removed from the club.", fg=typer.colors.GREEN)
             except NotMember:
                 typer.secho(f"❌ {selected_name} is not a member.", fg=typer.colors.RED)
+
+
+        elif choice == "Promote Member" and isinstance(member, ClubAdmin):
+            from errors import NotMember, BadFormatException
+            from club_member import ClubManager, ClubMember
+
+            eligible_members = [
+                m for m in club.members
+                if isinstance(m, ClubMember) and not isinstance(m, (ClubManager, ClubAdmin))
+            ]
+
+            if not eligible_members:
+                typer.secho("📌 No members available for promotion.", fg=typer.colors.MAGENTA)
+                continue
+
+            member_names = [m.student.name for m in eligible_members]
+            selected_name = select_option(member_names + ["Back"], "Select a member to promote:")
+
+            if selected_name == "Back" or selected_name is None:
+                continue
+
+            to_promote = next(m for m in eligible_members if m.student.name == selected_name)
+
+            try:
+                member.promote_member(to_promote)
+                typer.secho(f"✅ {selected_name} has been promoted to Manager!", fg=typer.colors.GREEN)
+            except BadFormatException as e:
+                typer.secho(f"❌ {e}", fg=typer.colors.RED)
+            except NotMember:
+                typer.secho("❌ Selected student is not a member of this club.", fg=typer.colors.RED)
+
+
 
 
         elif choice == "Back" or choice is None:
