@@ -36,7 +36,14 @@ class Student:
         raise BadFormatException("Invalid credentials!")
 
     def get_clubs(self) -> list['Club']:
-        return [x for x in db.get_clubs() if x.student == self]
+        c = []
+        for club in db.get_clubs():
+            students = []
+            for m in club.members:
+                students.append(m.student)
+            if self in students:
+                c.append(club)
+        return c
 
     def get_assignments(self) -> list['Assignment']:
         assignments = []

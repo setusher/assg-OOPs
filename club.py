@@ -19,9 +19,6 @@ class Club:
 
         admin_m = ClubAdmin(admin, self)
         self.members.append(admin_m)
-        admin.clubs.append(self)
-
-        db.add_club(self)
 
     def add_member(self, student: 'Student') -> 'ClubMember':
         from club_member import ClubMember

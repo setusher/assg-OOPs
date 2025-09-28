@@ -24,13 +24,15 @@ class Database(metaclass=DatabaseMeta):
         return self.students.get(enrollment)
 
     def get_students(self) -> List['Students']:
-        return self.students
+        return self.students.copy()
 
     def update_student(self, student: 'Student'):
         self.students[student.enrollment] = student
 
     def add_club(self, club: 'Club'):
+        if any(c is club or c.name == club.name for c in self.clubs):
+            return
         self.clubs.append(club)
 
     def get_clubs(self) -> List['Club']:
-        return self.clubs
+        return self.clubs.copy()
