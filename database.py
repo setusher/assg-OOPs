@@ -13,9 +13,11 @@ class DatabaseMeta(type):
 
 
 class Database(metaclass=DatabaseMeta):
+
     def __init__(self):
+        from vector import Vector
         self.students: Dict[str, 'Student'] = {}  # key is enrollment
-        self.clubs: List['Club'] = []
+        self.clubs: Vector['Club'] = Vector()
 
     def add_student(self, student: 'Student'):
         self.students[student.enrollment] = student
@@ -23,7 +25,7 @@ class Database(metaclass=DatabaseMeta):
     def get_student(self, enrollment: str) -> Optional['Student']:
         return self.students.get(enrollment)
 
-    def get_students(self) -> List['Students']:
+    def get_students(self) -> list['Students']:
         return list(self.students.values())
 
     def update_student(self, student: 'Student'):

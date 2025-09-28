@@ -10,10 +10,11 @@ db = Database()
 
 class Club:
     def __init__(self, name: str, admin: 'Student', assignments: list['Assignment'] = None):
+        from vector import Vector
         self.name = name
         self.__admin: 'ClubAdmin' = admin
-        self.__members: list['ClubMember'] = []
-        self.__assignments: list['Assignment'] = assignments or []
+        self.__members: Vector['ClubMember'] = Vector()
+        self.__assignments: Vector['Assignment'] = assignments or Vector()
 
         from club_member import ClubAdmin, ClubMember
 

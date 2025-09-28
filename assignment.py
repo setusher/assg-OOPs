@@ -12,11 +12,13 @@ db = Database()
 
 class Assignment:
     def __init__(self: T, title: str, max_score: int, deadline: datetime, club: 'Club', publisher: 'ClubManager'):
+        from vector import Vector
+
         self.title: str = title
         self.max_score: int = max_score
         self.deadline: datetime = deadline
         self.club: 'Club' = club
-        self.submissions: list['Submission'] = []
+        self.submissions: Vector['Submissions'] = Vector()
         self.publisher: 'ClubManager' = publisher
 
     def submit_assignment(self, student: 'Student', content: str) -> 'Submission':
@@ -37,8 +39,3 @@ class Assignment:
 
     def is_late(self, submission_date: datetime) -> bool:
         return submission_date > self.deadline
-
-    def __eq__(self, other):
-        if isinstance(other, Assignment):
-            return self.title == other.title and self.club == other.club
-        return NotImplemented

@@ -15,14 +15,15 @@ db = Database()
 # Manager capabilities minus the add assignments
 class ClubMember:
     def __init__(self, student: 'Student', club: 'Club'):
+        from vector import Vector
         self.student = student
         self.club = club
         self.joined_date = datetime.now()
 
-    def view_club_assignments(self) -> ['Assignment']:
+    def view_club_assignments(self) -> Vector['Assignment']:
         return self.club.view_assignments()
 
-    def view_my_submissions(self) -> ['Submission']:
+    def view_my_submissions(self) -> Vector['Submission']:
         return [s for s in self.student.get_submissions() if s.assignment.club == self.club]
 
 
