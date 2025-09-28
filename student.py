@@ -13,7 +13,6 @@ class Student:
     def __init__(self: T, enrollment: str, name: str, password: str):
         self.enrollment = enrollment
         self.name = name
-        self.clubs = []
         self.password = password
 
     def register(self) -> T:
@@ -37,23 +36,28 @@ class Student:
         raise BadFormatException("Invalid credentials!")
 
     def get_clubs(self) -> list['Club']:
-        return self.clubs.copy()
+        return [x for x in db.get_clubs() if x.student == self]
 
     def get_assignments(self) -> list['Assignment']:
-        assignments = [x for x in db.assignments if x.club in self.clubs]
-        return assignments.copy()
+        assignments = []
+        for x in self.get_clubs():
+            assignments.extend(x.assignments)
+        return assignments
 
     def get_submissions(self) -> list['Submission']:
-        sub = [x for x in db.submissions if x.student == self]
-        return sub.copy()
+        sub = []
+        for a in self.get_assignments():
+            sub.extend(a.submissions)
+        return sub
 
     def create_club(self, name: str):
-        from session import Session
         if any(x.club.name == name for x in db.get_clubs()):
             raise BadFormatException("Club with same name already exists!")
 
-        session = Session()
-        club = Club(name, session.current_user)
+        club = Club(name, self)
         db.add_club(club)
-        self.clubs.append(club)
-        db.update_student(self)
+
+    def __eq__(self, other):
+        if isinstance(other, Student):
+            return self.enrollment == other.enrollment
+        return NotImplemented

@@ -16,8 +16,6 @@ class Database(metaclass=DatabaseMeta):
     def __init__(self):
         self.students: Dict[str, 'Student'] = {}  # key is enrollment
         self.clubs: List['Club'] = []
-        self.assignments: List['Assignment'] = []
-        self.submissions: List['Submission'] = []
 
     def add_student(self, student: 'Student'):
         self.students[student.enrollment] = student
@@ -26,7 +24,7 @@ class Database(metaclass=DatabaseMeta):
         return self.students.get(enrollment)
 
     def get_students(self) -> List['Students']:
-        return self.students.copy()
+        return self.students
 
     def update_student(self, student: 'Student'):
         self.students[student.enrollment] = student
@@ -35,4 +33,4 @@ class Database(metaclass=DatabaseMeta):
         self.clubs.append(club)
 
     def get_clubs(self) -> List['Club']:
-        return self.clubs.copy()
+        return self.clubs

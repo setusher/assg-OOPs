@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import TYPE_CHECKING
 
 from database import Database
-from errors import NotMember, BadFormatException
 
 if TYPE_CHECKING:
     from assignment import Assignment
@@ -44,31 +43,22 @@ class ClubAdmin(ClubManager):
 
     def add_member(self, student: 'Student') -> ClubMember:
         member = self.club.add_member(student)
-        student.clubs.append(self.club)
-        db.update_student(student)
         return member
 
     def remove_member(self, student: 'Student'):
         self.club.remove_member(student)
-        student.clubs.remove(self.club)
-        db.update_student(student)
 
     def promote_member(self, member):
-        
-        from club_member import ClubManager, ClubAdmin, ClubMember
-        from errors import BadFormatException, NotMember
 
-        
+        from errors import BadFormatException, NotMember
         if member not in self.club.members:
             raise NotMember()
 
         target_index = self.club.members.index(member)
 
-        
         if isinstance(self.club.members[target_index], (ClubManager, ClubAdmin)):
             raise BadFormatException("The member is already a manager/admin!")
 
-    
         promoted = ClubManager(member.student, self.club)
         self.club.members[target_index] = promoted
 

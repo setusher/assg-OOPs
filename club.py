@@ -32,11 +32,6 @@ class Club:
 
         member = ClubMember(student, self)
         self.members.append(member)
-
-
-        if self not in student.clubs:
-            student.clubs.append(self)
-
         return member
 
     def remove_member(self, student: 'Student'):
