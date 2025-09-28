@@ -19,8 +19,8 @@ class Assignment:
         self.submissions: list['Submission'] = []
         self.publisher: 'ClubManager' = publisher
 
-    def submit_assignment(self, student: 'Student', assignment: T, content: str) -> 'Submission':
-        s = Submission(student, assignment, content)
+    def submit_assignment(self, student: 'Student', content: str) -> 'Submission':
+        s = Submission(student, self, content)
         self.submissions.append(s)
         return s
 

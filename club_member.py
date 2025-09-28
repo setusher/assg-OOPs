@@ -49,7 +49,6 @@ class ClubAdmin(ClubManager):
         self.club.remove_member(student)
 
     def promote_member(self, member):
-
         from errors import BadFormatException, NotMember
         if member not in self.club.members:
             raise NotMember()

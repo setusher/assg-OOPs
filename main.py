@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import inquirer
 import typer
 
@@ -216,7 +218,7 @@ def show_club_menu(club):
         choice = select_option(options, "Choose an action:")
 
         if choice == "View Assignments":
-            assignments = club.view_assignments()
+            assignments = member.view_club_assignments()
             if not assignments:
                 typer.secho("📌 No assignments yet.", fg=typer.colors.MAGENTA)
                 continue
@@ -237,11 +239,8 @@ def show_club_menu(club):
                 if sub_choice == "Submit Assignment":
 
                     content = typer.prompt("Enter your submission text")
-                    from submission import Submission
                     student = session.get_current_user()
-
-                    submission = Submission(student=student, assignment=selected_assignment, content=content)
-                    selected_assignment.add_submission(submission)
+                    selected_assignment.submit_assignment(student, content=content)
 
                     typer.secho("✅ Submission added successfully!", fg=typer.colors.GREEN)
                     break
@@ -249,14 +248,12 @@ def show_club_menu(club):
                 elif sub_choice == "Back" or sub_choice is None:
                     break
 
-
-        elif choice == "View Submissions":
+        elif choice == "View My Submissions":
             submissions = []
 
             member = club.get_member(session.get_current_user())
             if member:
-                for a in club.view_assignments():
-                    submissions.extend([s for s in a.submissions if s.student == session.get_current_user()])
+                submissions.extend(member.view_my_submissions())
 
             if not submissions:
                 typer.secho("📌 No submissions yet.", fg=typer.colors.MAGENTA)
@@ -283,22 +280,16 @@ def show_club_menu(club):
 
                 typer.echo(f"- {m.student.name} {role}")
 
-
         elif choice == "Add Assignment" and isinstance(member, (ClubManager, ClubAdmin)):
             title = typer.prompt("Assignment title")
             max_score = int(typer.prompt("Max score"))
             deadline_str = typer.prompt("Deadline (YYYY-MM-DD HH:MM)")
-            from datetime import datetime
             deadline = datetime.strptime(deadline_str, "%Y-%m-%d %H:%M")
-            from assignment import Assignment
-            new_assignment = Assignment(title=title, max_score=max_score, deadline=deadline, club=club,
-                                        publisher=member)
-            club.add_assignment(new_assignment)
+            member.add_assignment(title, max_score, deadline)
             typer.secho("✅ Assignment added successfully!", fg=typer.colors.GREEN)
 
-
         elif choice == "Remove Assignment" and isinstance(member, (ClubManager, ClubAdmin)):
-            assignments = club.view_assignments()
+            assignments = member.view_club_assignments()
             if not assignments:
                 typer.secho("📌 No assignments to remove.", fg=typer.colors.MAGENTA)
                 continue
@@ -309,10 +300,8 @@ def show_club_menu(club):
                 continue
 
             selected_assignment = next(a for a in assignments if a.title == selected_title)
-            club.remove_assignment(selected_assignment)
+            member.remove_assignment(selected_assignment)
             typer.secho("✅ Assignment removed successfully!", fg=typer.colors.GREEN)
-
-
 
         elif choice == "Add Member" and isinstance(member, ClubAdmin):
             student_enrollment = typer.prompt("Enter enrollment number of the student to add")
@@ -321,7 +310,7 @@ def show_club_menu(club):
             student = db.get_student(student_enrollment)
             if student:
                 try:
-                    club.add_member(student)
+                    member.add_member(student)
                     typer.secho(f"✅ {student.name} added to the club.", fg=typer.colors.GREEN)
                 except AlreadyMember:
                     typer.secho(f"❌ {student.name} is already a member.", fg=typer.colors.RED)
@@ -337,11 +326,10 @@ def show_club_menu(club):
             to_remove = next(m.student for m in club.members if m.student.name == selected_name)
             from errors import NotMember
             try:
-                club.remove_member(to_remove)
+                member.remove_member(to_remove)
                 typer.secho(f"✅ {selected_name} removed from the club.", fg=typer.colors.GREEN)
             except NotMember:
                 typer.secho(f"❌ {selected_name} is not a member.", fg=typer.colors.RED)
-
 
         elif choice == "Promote Member" and isinstance(member, ClubAdmin):
             from errors import NotMember, BadFormatException
@@ -369,11 +357,8 @@ def show_club_menu(club):
                 typer.secho(f"✅ {selected_name} has been promoted to Manager!", fg=typer.colors.GREEN)
             except BadFormatException as e:
                 typer.secho(f"❌ {e}", fg=typer.colors.RED)
-            except NotMember:
-                typer.secho("❌ Selected student is not a member of this club.", fg=typer.colors.RED)
-
-
-
+            except NotMember as e:
+                typer.secho(f"❌ {e}", fg=typer.colors.RED)
 
         elif choice == "Back" or choice is None:
             break
