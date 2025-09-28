@@ -50,15 +50,14 @@ class ClubAdmin(ClubManager):
 
     def promote_member(self, member):
         from errors import BadFormatException, NotMember
-        if member not in self.club.members:
+        if member not in self.club.get_members():
             raise NotMember()
 
-        target_index = self.club.members.index(member)
+        target_index = self.club.get_members().index(member)
 
-        if isinstance(self.club.members[target_index], (ClubManager, ClubAdmin)):
+        if isinstance(self.club.get_members()[target_index], (ClubManager, ClubAdmin)):
             raise BadFormatException("The member is already a manager/admin!")
 
         promoted = ClubManager(member.student, self.club)
-        self.club.members[target_index] = promoted
-
+        self.club.promote_member_status(promoted, target_index)
         return promoted

@@ -251,12 +251,12 @@ def show_club_menu(club):
                     )
 
         elif choice == "View members":
-            if not club.members:
+            if not club.get_members():
                 typer.secho("📌 No members in this club yet.", fg=typer.colors.MAGENTA)
                 continue
 
             typer.secho("\n📋 Club Members:", fg=typer.colors.BLUE, bold=True)
-            for m in club.members:
+            for m in club.get_members():
                 role = ""
                 from club_member import ClubAdmin, ClubManager
                 if isinstance(m, ClubAdmin):
@@ -304,12 +304,12 @@ def show_club_menu(club):
                 typer.secho("❌ Student not found.", fg=typer.colors.RED)
 
         elif choice == "Remove Member" and isinstance(member, ClubAdmin):
-            member_names = [m.student.name for m in club.members if m != member]  # cannot remove self
+            member_names = [m.student.name for m in club.get_members() if m != member]  # cannot remove self
             selected_name = select_option(member_names + ["Back"], "Select a member to remove:")
             if selected_name == "Back" or selected_name is None:
                 continue
 
-            to_remove = next(m.student for m in club.members if m.student.name == selected_name)
+            to_remove = next(m.student for m in club.get_members() if m.student.name == selected_name)
             from errors import NotMember
             try:
                 member.remove_member(to_remove)
@@ -322,7 +322,7 @@ def show_club_menu(club):
             from club_member import ClubManager, ClubMember
 
             eligible_members = [
-                m for m in club.members
+                m for m in club.get_members()
                 if isinstance(m, ClubMember) and not isinstance(m, (ClubManager, ClubAdmin))
             ]
 

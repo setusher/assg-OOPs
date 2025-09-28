@@ -39,7 +39,7 @@ class Student:
         c = []
         for club in db.get_clubs():
             students = []
-            for m in club.members:
+            for m in club.get_members():
                 students.append(m.student)
             if self in students:
                 c.append(club)
@@ -48,7 +48,7 @@ class Student:
     def get_assignments(self) -> list['Assignment']:
         assignments = []
         for x in self.get_clubs():
-            assignments.extend(x.assignments)
+            assignments.extend(x.get_assignments())
         return assignments
 
     def get_submissions(self) -> list['Submission']:
